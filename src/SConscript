@@ -1,9 +1,19 @@
+import os
+
 CC = 'clang'
 
 CFLAGS = " ".join([
     '-Weverything',
     '-std=c11'
 ])
+
+FILES = [
+    'main.c',
+    'lexer.c'
+]
+
+TEST_FILES = FILES[1:]
+TEST_FILES.append('tests.c');
 
 ragel = Builder(action = 'ragel -G2 $SOURCE -o $TARGET',
                 suffix = '.c',
@@ -13,9 +23,13 @@ env = Environment( CC=CC
                   ,CCFLAGS=CFLAGS
                   ,BUILDERS={'Ragel' : ragel} )
 
-roth = env.Program('roth', 'main.c')
+#Enable coloured output from Clang
+env['ENV']['TERM'] = os.environ['TERM']
 
-tests = env.Program('tests.c');
+lex = env.Ragel('lexer.rl')
+roth = env.Program('roth', FILES)
+
+tests = env.Program('tests', TEST_FILES);
 check = env.Command(target = 'check',
                     source = 'tests',
                     action = './' + tests[0].path)

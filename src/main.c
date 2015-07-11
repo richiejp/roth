@@ -16,15 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+#include "util.h"
 #include "lexer.h"
 
 int main(int argc, char **argv)
 {
-	struct roth_lexer_ops lops = { 
-		log = printf_s
-	};
+	struct roth_lexer_ops lops;
+	enum roth_lexer_error lerror = RLE_NONE;
 
-	roth_lexer_init(lops);
+	if(argc > 1){
+		roth_lexer_init(lops);
+		lerror = roth_lexer_go(argv[1], strchr(argv[1], 0));
+	}
 
 	return 0;
 }

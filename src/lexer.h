@@ -16,8 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-struct roth_lexer_ops {
-	void (*log)(char *restrict);
+#pragma once
+
+enum roth_lexer_error {
+	RLE_NONE = 0,
+	RLE_FATAL = 1
 };
 
-int roth_lexer_init(struct roth_lexer_ops ops);
+//Callbacks to other modules
+struct roth_lexer_ops {
+	enum roth_lexer_error (*todo)(char *restrict);
+};
+
+enum roth_lexer_error roth_lexer_init(struct roth_lexer_ops ops);
+enum roth_lexer_error roth_lexer_go(char *data, char* dataend);
