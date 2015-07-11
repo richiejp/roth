@@ -1,7 +1,8 @@
 CC = 'clang'
 
-WARNINGS=" ".join([
-    '-Weverything'
+CFLAGS = " ".join([
+    '-Weverything',
+    '-std=c11'
 ])
 
 ragel = Builder(action = 'ragel -G2 $SOURCE -o $TARGET',
@@ -9,5 +10,13 @@ ragel = Builder(action = 'ragel -G2 $SOURCE -o $TARGET',
                 src_suffix = '.rl')
 
 env = Environment( CC=CC
-                  ,CCFLAGS=WARNINGS
+                  ,CCFLAGS=CFLAGS
                   ,BUILDERS={'Ragel' : ragel} )
+
+roth = env.Program('roth', 'main.c')
+
+tests = env.Program('tests.c');
+check = env.Command(target = 'check',
+                    source = 'tests',
+                    action = './' + tests[0].path)
+env.Depends(check, tests)
