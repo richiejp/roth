@@ -16,25 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define _STDC_WANT_LIB_EXT1_ 1
-
 #include <stdio.h>
 #include <stdbool.h>
+#include "util.h"
 #include "lexer.h"
 
-#ifdef _STDC_LIB_EXT1_
-#define PRINT printf_s
-#else
-#define PRINT printf
-#endif
+#define TESTCOUNT 2
 
-#define TESTCOUNT 1
+#define TEST(n)	static bool _n(char **name);	\
+static bool n(char **name)			\
+{						\
+	*name = #n;				\
+	return _n;				\
+}						\
+static bool _n()
 
 //Array of test function pointers: bool test(char *name)
 static bool (*tests[TESTCOUNT])(char **);
 
-static bool testme(char **name) {
+static bool testme(char **name)
+{
 	*name = "testme";
+	return true;
+}
+
+TEST(test_macro_test)
+{
 	return true;
 }
 
@@ -42,16 +49,19 @@ int main(){
 	int failed = 0;
 	char *name = "unnamed!";
 
+	roth_printf("\n	--==[ Running Roth tests ]==--\n\n");
+
 	tests[0] = testme;
+	tests[1] = test_macro_test;
 
 	for(int i = 0; i < TESTCOUNT; i++) {
 		if((*tests[i])(&name)) {
-			PRINT("[%d]Passed %s\n", i, name);
+			roth_printf("[%d]Passed %s\n", i, name);
 		} else {
-			PRINT("[%d]Failed %s\n", i, name);
+			roth_printf("\n[%d]Failed %s!!!!!!!\n", i, name);
 		}
 	}
 
-	PRINT("\n%d tests failed out of %d\n", failed, TESTCOUNT);
+	roth_printf("\n%d tests failed out of %d\n", failed, TESTCOUNT);
 }
 
