@@ -18,18 +18,19 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include "util.h"
 #include "lexer.h"
 
-#define TESTCOUNT 2
+#define TESTCOUNT 4
 
-#define TEST(n)	static bool _n(char **name);	\
+#define TEST(n)	static bool _##n(char **name);	\
 static bool n(char **name)			\
 {						\
 	*name = #n;				\
-	return _n;				\
+	return _##n;				\
 }						\
-static bool _n()
+static bool _##n()
 
 //Array of test function pointers: bool test(char *name)
 static bool (*tests[TESTCOUNT])(char **);
@@ -45,6 +46,20 @@ TEST(test_macro_test)
 	return true;
 }
 
+TEST(init_lexer)
+{
+	struct roth_lexer_ops lops;
+	return roth_lexer_init(lops);
+}
+
+TEST(lex_empty_list)
+{
+	char *code = "()";
+	struct roth_lexer_ops lops;
+	roth_lexer_init(lops);
+	return roth_lexer_go(code, strchr(code, 0));
+}
+
 int main(){
 	int failed = 0;
 	char *name = "unnamed!";
@@ -53,15 +68,19 @@ int main(){
 
 	tests[0] = testme;
 	tests[1] = test_macro_test;
+	tests[2] = init_lexer;
+	tests[3] = lex_empty_list;
 
 	for(int i = 0; i < TESTCOUNT; i++) {
 		if((*tests[i])(&name)) {
-			roth_printf("[%d]Passed %s\n", i, name);
+			roth_printf("[Test %d]Passed %s\n", i+1, name);
 		} else {
-			roth_printf("\n[%d]Failed %s!!!!!!!\n", i, name);
+			roth_printf("\n[Test %d]Failed %s!!!!!!!\n", i+1, name);
 		}
 	}
 
-	roth_printf("\n%d tests failed out of %d\n", failed, TESTCOUNT);
+	roth_printf("\n	-{ %d tests failed out of %d }-\n", failed, TESTCOUNT);
+
+	return 0;
 }
 
