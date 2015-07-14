@@ -9,24 +9,39 @@ CFLAGS = " ".join([
 
 FILES = [
     'main.c',
-    'lexer.c'
+    'lexer.c',
+    'parser.c'
 ]
 
 TEST_FILES = FILES[1:]
-TEST_FILES.append('tests.c');
+TEST_FILES.append('tests.c')
+
+LEMON_FILES = ['lemon.c']
 
 ragel = Builder(action = 'ragel -G2 $SOURCE -o $TARGET',
                 suffix = '.c',
                 src_suffix = '.rl')
 
+lemon = Builder(action = 'build/lemon $SOURCE',
+                suffix = '.c',
+                src_suffix = '.y')
+
+BUILDERS = {'Ragel' : ragel, 
+            'Lemon' : lemon}
+
 env = Environment( CC=CC
                   ,CCFLAGS=CFLAGS
-                  ,BUILDERS={'Ragel' : ragel} )
+                  ,BUILDERS=BUILDERS )
 
 #Enable coloured output from Clang
 env['ENV']['TERM'] = os.environ['TERM']
 
+lemonp = env.Program('lemon', 'lemon.c')
+parser = env.Lemon('parser.y')
+env.Depends(parser, lemonp)
+
 lex = env.Ragel('lexer.rl')
+
 roth = env.Program('roth', FILES)
 
 tests = env.Program('tests', TEST_FILES);
