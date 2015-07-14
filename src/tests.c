@@ -22,7 +22,7 @@
 #include "util.h"
 #include "lexer.h"
 
-#define TESTCOUNT 4
+#define TESTCOUNT 5
 
 #define TEST(n)	static bool _##n(char **name);	\
 static bool n(char **name)			\
@@ -57,7 +57,15 @@ TEST(lex_empty_list)
 	char *code = "()";
 	struct roth_lexer_ops lops;
 	roth_lexer_init(lops);
-	return roth_lexer_go(code, strchr(code, 0));
+	return roth_lexer_go(code, code + 1) == RLE_NONE;
+}
+
+TEST(lex_bad_char)
+{
+	char *code = "(\x1B)";
+	struct roth_lexer_ops lops;
+	roth_lexer_init(lops);
+	return roth_lexer_go(code, code + 2) == RLE_FATAL;
 }
 
 int main(){
@@ -70,6 +78,7 @@ int main(){
 	tests[1] = test_macro_test;
 	tests[2] = init_lexer;
 	tests[3] = lex_empty_list;
+	tests[4] = lex_bad_char;
 
 	for(int i = 0; i < TESTCOUNT; i++) {
 		if((*tests[i])(&name)) {
