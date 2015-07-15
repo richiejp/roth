@@ -49,7 +49,8 @@
 
 #define ROTH_DEBUG(msg, ...)				\
 	do{						\
-		roth_printf("[%s:%s] ", __FILE__, __LINE__);		\
+		roth_printf("[%s:%s:%s] ",			\
+			    __FILE__, __func__, __LINE__);		\
 		roth_printf(msg, ##__VA_ARGS__);	\
 		roth_printf("\n");			\
 	}while(0)

@@ -39,6 +39,7 @@ env['ENV']['TERM'] = os.environ['TERM']
 lemonp = env.Program('lemon', 'lemon.c')
 parser = env.Lemon('parser.y')
 env.Depends(parser, lemonp)
+env.Depends(lemonp, 'lempar.c')
 
 lex = env.Ragel('lexer.rl')
 
