@@ -6,8 +6,20 @@
 #include "parser.h"
 }
 
+%name roth_parser_
+%token_prefix ROTH_TOK_
+//%token_type { int }
+
 %syntax_error {
 	ROTH_LOG("Syntax Error, good luck working out why!");
+}
+
+%parse_failure {
+	ROTH_LOG("I can't deal with this mess.");
+}
+
+%stack_overflow {
+	ROTH_LOG("STOP, STOP, too much, my stack is too small for that!");
 }
 
 program ::= sexp(A). { 
