@@ -24,11 +24,11 @@
 
 #define TESTCOUNT 5
 
-#define TEST(n)	static bool _##n(char **name);	\
+#define TEST(n)	static bool _##n();		\
 static bool n(char **name)			\
 {						\
 	*name = #n;				\
-	return _##n;				\
+	return _##n();				\
 }						\
 static bool _##n()
 
